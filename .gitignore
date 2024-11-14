@@ -1,32 +1,79 @@
-# Prerequisites
-*.d
+# Ignore build artifacts
+/build/
+/out/
+/bin/
+/lib/
+/CMakeFiles/
+/CMakeCache.txt
+/Makefile
+/*.cmake
+/*.dir/
 
-# Compiled Object files
-*.slo
-*.lo
+# Ignore temporary and backup files
+*~
+*.swp
+*.swo
+
+# Ignore generated executables and object files
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
 *.so
-*.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+*.dylib
 *.exe
 *.out
-*.app
+*.a
+*.lib
+*.lo
+
+# Ignore logs and debugging files
+*.log
+*.stackdump
+
+# Ignore Visual Studio Code settings and workspace files
+.vscode/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/c_cpp_properties.json
+
+# Ignore Dev Container configuration
+.devcontainer/*.log
+.devcontainer/.env
+
+# Ignore Python virtual environments and dependencies
+__pycache__/
+/*.py[cod]
+*.egg-info/
+venv/
+.env/
+*.env
+
+# Ignore IDE-specific files
+.idea/
+.DS_Store
+Thumbs.db
+
+# Ignore dependency artifacts
+/external/
+/vendor/
+
+# Ignore GitHub Codespaces and Docker-related files
+*.pid
+docker-compose.override.yml
+Dockerfile
+docker-compose.yml
+
+# Ignore generated documentation
+docs/
+/*.html
+
+# Ignore SQLite database files (if any are generated)
+*.db
+*.sqlite
+
+# Ignore files for specific tools used in Afterburner project
+benchmark_results.json
+cmake_install.cmake
+compile_commands.json
+test_results.xml
