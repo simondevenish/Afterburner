@@ -1,0 +1,42 @@
+# Ignore the build directory
+build/
+cmake-build-debug/
+cmake-build-release/
+
+# Ignore any compiled object files
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+
+# Ignore any temporary files or logs
+*.log
+*.tmp
+*.swp
+*.DS_Store
+
+# Ignore IDE-specific files
+.idea/
+.vscode/
+*.code-workspace
+
+# Ignore dependencies or package manager cache
+node_modules/
+__pycache__/
+*.pyc
+
+# Ignore git metadata and local changes
+.git/
+.gitignore
+*.orig
+
+# Ignore Docker-related files that should not be rebuilt
+.dockerignore
+
+# Ignore generated documentation
+docs/generated/
+*.md~

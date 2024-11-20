@@ -1,23 +1,32 @@
 {
-    "name": "Afterburner Dev Container",
-    "dockerFile": "Dockerfile",
+    "name": "Afterburner Dev Environment",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "context": ".."
+    },
+    "features": {},
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-vscode.cpptools",
-                "ms-python.python",
-                "ms-vscode.cmake-tools"
-            ],
-            "settings": {
-                "editor.formatOnSave": true
-            }
+                "ms-vscode.cmake-tools",
+                "GitHub.vscode-github-actions",
+                "streetsidesoftware.code-spell-checker",
+                "ms-python.python"
+            ]
         }
     },
-    "postCreateCommand": "pip3 install -r /workspace/Afterburner/requirements.txt",
-    "features": {
-        "ghcr.io/devcontainers/features/python:1": {
-            "version": "3.8"
-        }
-    },
-    "remoteUser": "vscode"
+    "postCreateCommand": [
+        "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug",
+        "cmake --build build"
+    ],
+    "remoteUser": "root",
+    "workspaceFolder": "/usr/src/Afterburner",
+    "runArgs": [
+        "--cap-add=SYS_PTRACE", 
+        "--security-opt=seccomp=unconfined"
+    ],
+    "mounts": [
+        "source=afterburner_cache,target=/root/.cache,type=volume"
+    ]
 }

@@ -1,0 +1,20 @@
+services:
+  afterburner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/workspace:cached
+      - afterburner_cache:/root/.cache
+    ports:
+      - "8080:8080" # Example port mapping
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+      - CMAKE_BUILD_TYPE=Debug
+    command: /bin/bash
+
+volumes:
+  afterburner_cache:
+    driver: local

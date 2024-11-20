@@ -58,12 +58,6 @@ Thumbs.db
 /external/
 /vendor/
 
-# Ignore GitHub Codespaces and Docker-related files
-*.pid
-docker-compose.override.yml
-Dockerfile
-docker-compose.yml
-
 # Ignore generated documentation
 docs/
 /*.html

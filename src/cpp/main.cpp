@@ -3,7 +3,6 @@
 #include <benchmark/benchmark.h>       // Google Benchmark
 #include <asio.hpp>                    // Boost Asio (standalone)
 #include <spdlog/spdlog.h>             // spdlog
-#include <grpc/grpc.h>                 // gRPC
 #include <sqlite3.h>                   // SQLite
 #include <nlohmann/json.hpp>           // Nlohmann JSON
 #include <gsl/gsl_rng.h>               // GNU Scientific Library
@@ -26,11 +25,6 @@ void testBoostAsio() {
 
 void testSpdlog() {
     spdlog::info("Spdlog initialized successfully.");
-}
-
-void testGRPC() {
-    grpc::ServerBuilder builder;
-    std::cout << "gRPC initialized successfully." << std::endl;
 }
 
 void testSQLite() {
@@ -72,7 +66,6 @@ int main() {
     testGoogleBenchmark();
     testBoostAsio();
     testSpdlog();
-    testGRPC();
     testSQLite();
     testJSON();
     testGSL();

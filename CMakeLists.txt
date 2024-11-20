@@ -1,67 +1,92 @@
+# Set CMake policies
+cmake_policy(SET CMP0002 NEW)  # Handle duplicate target names gracefully
+cmake_policy(SET CMP0079 NEW) # Allow linking targets from other directories
+
 # Minimum CMake version
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.20)
 
 # Project name and language
 project(Afterburner LANGUAGES CXX)
 
 # Set the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add main source file
-add_executable(Afterburner src/cpp/main.cpp)
+# Output directories for built files
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Find and link LAPACK and BLAS
+# Dependencies
+
+# LAPACK, LAPACKE, and BLAS
 find_package(LAPACK REQUIRED)
 find_package(BLAS REQUIRED)
-target_link_libraries(Afterburner PRIVATE LAPACK::LAPACK BLAS::BLAS)
+find_library(LAPACKE_LIBRARY lapacke REQUIRED PATHS /usr/lib/aarch64-linux-gnu /usr/local/lib)
+include_directories(/usr/include)
 
-# Find and link GSL
+# GSL
 find_package(GSL REQUIRED)
-target_link_libraries(Afterburner PRIVATE GSL::gsl GSL::gslcblas)
 
-# Find and link ZeroMQ
+# ZeroMQ
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(ZMQ REQUIRED libzmq)
-target_link_libraries(Afterburner PRIVATE ${ZMQ_LIBRARIES})
 include_directories(${ZMQ_INCLUDE_DIRS})
+link_directories(${ZMQ_LIBRARY_DIRS})
+add_definitions(${ZMQ_CFLAGS_OTHER})
 
-# Google Benchmark as an external project
-include(FetchContent)
-FetchContent_Declare(
-    benchmark
-    GIT_REPOSITORY https://github.com/google/benchmark.git
-    GIT_TAG main
-)
-FetchContent_MakeAvailable(benchmark)
-
-# Link Google Benchmark to Afterburner
-target_link_libraries(Afterburner PRIVATE benchmark::benchmark)
-
-# Find and link Boost Asio (standalone version)
-find_path(ASIO_INCLUDE_DIRS "asio.hpp")
-include_directories(${ASIO_INCLUDE_DIRS})
-
-# Find and link spdlog
+# spdlog
 find_package(spdlog REQUIRED)
-target_link_libraries(Afterburner PRIVATE spdlog::spdlog)
 
-# Find and link gRPC
-find_package(gRPC CONFIG REQUIRED)
-target_link_libraries(Afterburner PRIVATE gRPC::grpc)
+# Google Benchmark
+find_package(benchmark REQUIRED)
 
-# Find and link SQLite
+# Protobuf
+find_package(Protobuf REQUIRED)
+include_directories(${Protobuf_INCLUDE_DIRS})
+
+# SQLite
 find_package(SQLite3 REQUIRED)
-target_link_libraries(Afterburner PRIVATE SQLite::SQLite3)
 
-# Find and link Nlohmann JSON (header-only)
-find_package(nlohmann_json CONFIG REQUIRED)
-target_link_libraries(Afterburner PRIVATE nlohmann_json::nlohmann_json)
+# Nlohmann JSON
+find_package(nlohmann_json REQUIRED)
 
-# Include directories for the project
-target_include_directories(Afterburner PRIVATE ${CMAKE_SOURCE_DIR}/src/cpp)
+# Boost.Asio standalone (header-only)
+include_directories(/usr/local/include)  # Ensure Asio headers are included
 
-# Enable additional warnings
-if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(Afterburner PRIVATE -Wall -Wextra -Wpedantic)
-endif()
+# Create a static library for shared code
+add_library(AfterburnerLib STATIC)
+target_sources(AfterburnerLib PRIVATE src/cpp/main.cpp)
+target_include_directories(AfterburnerLib PRIVATE ${CMAKE_SOURCE_DIR}/src/cpp)
+
+# Link dependencies to the static library
+target_link_libraries(AfterburnerLib
+    PRIVATE
+        LAPACK::LAPACK
+        BLAS::BLAS
+        ${LAPACKE_LIBRARY}
+        GSL::gsl
+        GSL::gslcblas
+        benchmark::benchmark
+        spdlog::spdlog
+        ${Protobuf_LIBRARIES}
+        SQLite::SQLite3
+        nlohmann_json::nlohmann_json
+        ${ZMQ_LIBRARIES}
+)
+
+# Create the Afterburner executable
+add_executable(Afterburner src/cpp/main.cpp)
+
+# Link dependencies to the Afterburner executable
+target_link_libraries(Afterburner PRIVATE AfterburnerLib)
+
+# Enable testing
+enable_testing()
+
+# Add test executable
+add_executable(AfterburnerTests tests/cpp_tests/googletest/tests.cpp)
+target_link_libraries(AfterburnerTests PRIVATE AfterburnerLib benchmark::benchmark)
+
+# Add a test target
+add_test(NAME AfterburnerTests COMMAND AfterburnerTests)
